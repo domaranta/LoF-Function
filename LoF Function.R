@@ -67,6 +67,10 @@ LoF.SY <-function(formula, cluster, data){
     # if(method=='SY'){
     #   
     # }
+    model1 = lm(formula, FCData)
+    model6 = lm(Y~X*cluster+cluster:I(X^2))
+    model6 = lm(Y~X*FCData$Cluster+FCData$Cluster:I(X^2))
+    anova(model1, model6)
     df1=
       df2=
       F.stat=
@@ -81,10 +85,20 @@ LoF.SY <-function(formula, cluster, data){
     X1=FCData[,all.vars(formula)[2]]
     X2=FCData[,all.vars(formula)[3]]
     
-    df1=
-      df2=
-      F.stat=
-      p.value=
+    formula = Sale.Price~Age+Square.Feet
+    model1 = lm(formula, FCData)
+    model6 = lm(Y~X1*cluster+cluster:I(X1^2)+cluster:I(X1^2))
+    model6 = lm(Y~X1*X2*FCData$Cluster+FCData$Cluster:I(X1^2)+FCData$Cluster:I(X2^2))
+    
+    SSE_X=(anova(model1))$'Sum Sq'[length(anova(model1)$'Sum Sq')]
+    SSE_XW=(anova(model6))$'Sum Sq'[length(anova(model6)$'Sum Sq')]
+    
+    df_X=(anova(model1))$'Df'[length(anova(model1)$'Df')]
+    df_XW=(anova(model6))$'Df'[length(anova(model6)$'Df')]
+      df1=df_X-df_XW
+      df2=df_XW
+      F.stat=(SSE_X-SSE_XW)/df1/(SSE_XW/df2)
+      p.value=pf(F, df1, df2,lower.tail=FALSE)
   }
   
   return(data.frame(F=F.stat,df1=df1, df2=df2, p.value=p.value))
