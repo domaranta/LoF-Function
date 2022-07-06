@@ -57,6 +57,7 @@ formula = Sale.Price~Age+Square.Feet+Cluster
 ########################################
 
 LoF <-function(formula, cluster, data, method){
+  cluster = data[,deparse(substitute(cluster))]
   #If a 1 predictor model
   if(length(all.vars(formula))==2){
     
@@ -179,14 +180,14 @@ LoF <-function(formula, cluster, data, method){
 }
 #=======================================
 #Examples
-LoF(Sale.Price~Age, cluster=Cluster, data=FCData)
-LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData)
+LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')
+LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData, method = 'SY')
 
-LoF(Sale.Price~Age, cluster=FCData$Cluster, data=FCData, method = 'SY')
-LoF(Sale.Price~Square.Feet+Age, cluster=FCData$Cluster, data=FCData,method = 'SY')
+LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'AR')
+LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'AR')
 
-LoF(Sale.Price~Age, cluster=FCData$Cluster, data=FCData, method = 'AR')
-LoF(Sale.Price~Square.Feet+Age, cluster=FCData$Cluster, data=FCData,method = 'AR')
+LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'C')
+LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'C')
 
-LoF(Sale.Price~Age, cluster=FCData$Cluster, data=FCData, method = 'C')
-LoF(Sale.Price~Square.Feet+Age, cluster=FCData$Cluster, data=FCData,method = 'C')
+
+
