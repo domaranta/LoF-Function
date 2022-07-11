@@ -57,7 +57,21 @@ formula = Sale.Price~Age+Square.Feet+Cluster
 ########################################
 
 LoF <-function(formula, cluster, data, method){
-  cluster = data[,deparse(substitute(cluster))]
+  
+  if(length(all.vars(formula))>3){
+    stop('function designed for <3 predictors')
+  }
+  if(is.null(cluster) == TRUE){
+    stop('must specify a cluster ')
+  }  
+  
+  
+  #if(is.null(cluster) == FALSE){
+    cluster = data[,deparse(substitute(cluster))]
+  #}  
+  
+  
+  
   #If a 1 predictor model
   if(length(all.vars(formula))==2){
     
@@ -189,5 +203,5 @@ LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'AR')
 LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'C')
 LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'C')
 
-
+LoF(Sale.Price~Age+Square.Feet,  data=FCData, method = 'C')
 
