@@ -154,7 +154,6 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
         x.mean[cluster == i] = x.means[i]
       }
       
-      
       model2 = lm(Y~x.mean, data) #does this allow for formula properly?
       model3 = lm(Y~cluster)
       model5 = lm(Y~X+cluster+X:cluster)
@@ -171,7 +170,32 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
       F.stat=(SSE_X0-SSE_Z)/df1/(SSE_P/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
-  
+    #If method selected is Christensen '91
+    if(method == 'C91'){
+      #Calculate each model information
+      x.means=aggregate(X,by=list(cluster),mean)$x
+      x.mean = NA
+      for(i in 1:length(unique(cluster))){
+        x.mean[cluster == i] = x.means[i]
+      }
+      
+      model1 = lm(formula, data)
+      model2 = lm(Y~x.mean, data) #does this allow for formula properly?
+      model3 = lm(Y~cluster)
+      SSE_X=(anova(model1))$'Sum Sq'[length(anova(model1)$'Sum Sq')]
+      SSE_X0=(anova(model2))$'Sum Sq'[length(anova(model2)$'Sum Sq')]
+      SSE_Z=(anova(model3))$'Sum Sq'[length(anova(model3)$'Sum Sq')]
+      df_X=(anova(model1))$'Df'[length(anova(model1)$'Df')]
+      df_X0=(anova(model2))$'Df'[length(anova(model2)$'Df')]
+      df_Z=(anova(model3))$'Df'[length(anova(model3)$'Df')]
+      
+      
+      #compute test values
+      df1=df_X0-df_Z
+      df2=df_X-df_X0+df_Z
+      F.stat=((SSE_X0-SSE_Z)/df1)/((SSE_X-SSE_X0+SSE_Z)/df2)
+      p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
+    }
   }
   
   #If a 2 predictor model
@@ -214,7 +238,7 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
     #If method selected is Christensen '89
-    if(method == 'C'){
+    if(method == 'C89'){
       model1 = lm(formula, data)
       model4 = lm(Y~X1+X2+cluster)
       SSE_X=(anova(model1))$'Sum Sq'[length(anova(model1)$'Sum Sq')]
@@ -286,6 +310,35 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
       F.stat=(SSE_X0-SSE_Z)/df1/(SSE_P/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
+    #If method selected is Christensen '91
+    if(method == 'C91'){
+      #Calculate each model information
+      x1.means=aggregate(X1,by=list(cluster),mean)$x
+      x2.means=aggregate(X2,by=list(cluster),mean)$x
+      x1.mean = NA
+      x2.mean = NA
+      for(i in 1:length(unique(cluster))){
+        x1.mean[cluster == i] = x1.means[i]
+        x2.mean[cluster == i] = x2.means[i]
+      }
+      
+      model1 = lm(formula, data)
+      model2 = lm(Y~x1.mean+x2.mean, data) #does this allow for formula properly?
+      model3 = lm(Y~cluster)
+      SSE_X=(anova(model1))$'Sum Sq'[length(anova(model1)$'Sum Sq')]
+      SSE_X0=(anova(model2))$'Sum Sq'[length(anova(model2)$'Sum Sq')]
+      SSE_Z=(anova(model3))$'Sum Sq'[length(anova(model3)$'Sum Sq')]
+      df_X=(anova(model1))$'Df'[length(anova(model1)$'Df')]
+      df_X0=(anova(model2))$'Df'[length(anova(model2)$'Df')]
+      df_Z=(anova(model3))$'Df'[length(anova(model3)$'Df')]
+      
+      
+      #compute test values
+      df1=df_X0-df_Z
+      df2=df_X-df_X0+df_Z
+      F.stat=((SSE_X0-SSE_Z)/df1)/((SSE_X-SSE_X0+SSE_Z)/df2)
+      p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
+    }
   }
   
   return(data.frame(F=F.stat,df1=df1, df2=df2, p.value=p.value))
@@ -298,9 +351,9 @@ LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData, method = 'SY')
 LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'AR')
 LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'AR')
 
-LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'C')
-LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'C')
+LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'C89')
+LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'C89')
 
-LoF(Sale.Price~Age+Square.Feet,  data=FCData, method = 'C')
+LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'C91')
 
-LoF(Sale.Price~Age+Square.Feet, cluster=Cluster, data=FCData, method = 'JSL')
+LoF(Sale.Price~Age+Square.Feet, cluster=Cluster, data=FCData, method = 'C91')
