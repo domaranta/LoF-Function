@@ -62,13 +62,8 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
     stop('function designed for <3 predictors')
   }
   
-  
-  #if(is.null(cluster) == FALSE){
-    cluster = data[,deparse(substitute(cluster))]
-  #}  
-  
-  
-  
+  cluster = data[,deparse(substitute(cluster))]
+ 
   #If a 1 predictor model
   if(length(all.vars(formula))==2){
     
@@ -148,6 +143,32 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
       df1=df_X0-df_Z
       df2=df_XZ
       F.stat=(SSE_X0-SSE_Z)/df1/(SSE_XZ/df2)
+      p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
+    }
+    #If method selected is JSL
+    if(method == 'JSL'){
+      #Calculate each model information
+      x.means=aggregate(X,by=list(cluster),mean)$x
+      x.mean = NA
+      for(i in 1:length(unique(cluster))){
+        x.mean[cluster == i] = x.means[i]
+      }
+      
+      
+      model2 = lm(Y~x.mean, data) #does this allow for formula properly?
+      model3 = lm(Y~cluster)
+      model5 = lm(Y~X+cluster+X:cluster)
+      SSE_X0=(anova(model2))$'Sum Sq'[length(anova(model2)$'Sum Sq')]
+      SSE_Z=(anova(model3))$'Sum Sq'[length(anova(model3)$'Sum Sq')]
+      SSE_P=(anova(model5))$'Sum Sq'[length(anova(model5)$'Sum Sq')]
+      df_X0=(anova(model2))$'Df'[length(anova(model2)$'Df')]
+      df_Z=(anova(model3))$'Df'[length(anova(model3)$'Df')]
+      df_P=(anova(model5))$'Df'[length(anova(model5)$'Df')]
+      
+      #compute test values
+      df1=df_X0-df_Z
+      df2=df_P
+      F.stat=(SSE_X0-SSE_Z)/df1/(SSE_P/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
   
@@ -236,6 +257,35 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
       F.stat=(SSE_X0-SSE_Z)/df1/(SSE_XZ/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
+    #If method selected is JSL
+    if(method == 'JSL'){
+      #Calculate each model information
+      x1.means=aggregate(X1,by=list(cluster),mean)$x
+      x2.means=aggregate(X2,by=list(cluster),mean)$x
+      x1.mean = NA
+      x2.mean = NA
+      for(i in 1:length(unique(cluster))){
+        x1.mean[cluster == i] = x1.means[i]
+        x2.mean[cluster == i] = x2.means[i]
+      }
+      
+      
+      model2 = lm(Y~x1.mean+x2.mean, data) #does this allow for formula properly?
+      model3 = lm(Y~cluster)
+      model5 = lm(Y~X1+X2+cluster+X1:cluster+X2:cluster)
+      SSE_X0=(anova(model2))$'Sum Sq'[length(anova(model2)$'Sum Sq')]
+      SSE_Z=(anova(model3))$'Sum Sq'[length(anova(model3)$'Sum Sq')]
+      SSE_P=(anova(model5))$'Sum Sq'[length(anova(model5)$'Sum Sq')]
+      df_X0=(anova(model2))$'Df'[length(anova(model2)$'Df')]
+      df_Z=(anova(model3))$'Df'[length(anova(model3)$'Df')]
+      df_P=(anova(model5))$'Df'[length(anova(model5)$'Df')]
+      
+      #compute test values
+      df1=df_X0-df_Z
+      df2=df_P
+      F.stat=(SSE_X0-SSE_Z)/df1/(SSE_P/df2)
+      p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
+    }
   }
   
   return(data.frame(F=F.stat,df1=df1, df2=df2, p.value=p.value))
@@ -253,4 +303,4 @@ LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'C')
 
 LoF(Sale.Price~Age+Square.Feet,  data=FCData, method = 'C')
 
-LoF(Sale.Price~Age+Square.Feet, cluster=Cluster, data=FCData, method = 'S')
+LoF(Sale.Price~Age+Square.Feet, cluster=Cluster, data=FCData, method = 'JSL')
