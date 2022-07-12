@@ -63,6 +63,9 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
   }
   
   cluster = data[,deparse(substitute(cluster))]
+  if(is.numeric(cluster)== TRUE){
+    cluster <- as.factor(cluster)
+  }
  
   #If a 1 predictor model
   if(length(all.vars(formula))==2){
