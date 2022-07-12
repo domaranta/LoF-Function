@@ -56,14 +56,11 @@ formula = Sale.Price~Age+Square.Feet+Cluster
 # LoF Su & Yang                        #
 ########################################
 
-LoF <-function(formula, cluster, data, method){
+LoF <-function(formula, cluster = NULL, data, method = "SY"){
   
   if(length(all.vars(formula))>3){
     stop('function designed for <3 predictors')
   }
-  if(is.null(cluster) == TRUE){
-    stop('must specify a cluster ')
-  }  
   
   
   #if(is.null(cluster) == FALSE){
@@ -78,8 +75,6 @@ LoF <-function(formula, cluster, data, method){
     #Extract Y, X from formula
     Y=data[,all.vars(formula)[1]]
     X=data[,all.vars(formula)[2]]
-    #cluster= data[,paste("",clusters)]
-    #cluster = data$paste("",clusters)
     
     #If method selected is Su and Yang
     if(method=='SY'){
@@ -114,7 +109,7 @@ LoF <-function(formula, cluster, data, method){
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
     #If method selected is Christensen '89
-    if(method == 'C'){
+    if(method == 'C89'){
       #Calculate each model information
       model1 = lm(formula, data)
       model4 = lm(Y~X+cluster)
@@ -129,7 +124,32 @@ LoF <-function(formula, cluster, data, method){
       F.stat=(SSE_X-SSE_XZ)/df1/(SSE_XZ/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
-    
+    #If method selected is Shillington
+    if(method == 'S'){
+      #Calculate each model information
+      x.means=aggregate(X,by=list(cluster),mean)$x
+      x.mean = NA
+      for(i in 1:length(unique(cluster))){
+        x.mean[cluster == i] = x.means[i]
+      }
+      
+      
+      model2 = lm(Y~x.mean, data) #does this allow for formula properly?
+      model3 = lm(Y~cluster)
+      model4 = lm(Y~X+cluster)
+      SSE_X0=(anova(model2))$'Sum Sq'[length(anova(model2)$'Sum Sq')]
+      SSE_Z=(anova(model3))$'Sum Sq'[length(anova(model3)$'Sum Sq')]
+      SSE_XZ=(anova(model4))$'Sum Sq'[length(anova(model4)$'Sum Sq')]
+      df_X0=(anova(model2))$'Df'[length(anova(model2)$'Df')]
+      df_Z=(anova(model3))$'Df'[length(anova(model3)$'Df')]
+      df_XZ=(anova(model4))$'Df'[length(anova(model4)$'Df')]
+      
+      #compute test values
+      df1=df_X0-df_Z
+      df2=df_XZ
+      F.stat=(SSE_X0-SSE_Z)/df1/(SSE_XZ/df2)
+      p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
+    }
   
   }
   
@@ -187,7 +207,35 @@ LoF <-function(formula, cluster, data, method){
       F.stat=(SSE_X-SSE_XZ)/df1/(SSE_XZ/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
-
+    #If method selected is Shillington
+    if(method == 'S'){
+      #Calculate each model information
+      x1.means=aggregate(X1,by=list(cluster),mean)$x
+      x2.means=aggregate(X2,by=list(cluster),mean)$x
+      x1.mean = NA
+      x2.mean = NA
+      for(i in 1:length(unique(cluster))){
+        x1.mean[cluster == i] = x1.means[i]
+        x2.mean[cluster == i] = x2.means[i]
+      }
+      
+      
+      model2 = lm(Y~x1.mean+x2.mean, data) #does this allow for formula properly?
+      model3 = lm(Y~cluster)
+      model4 = lm(Y~X1+X2+cluster)
+      SSE_X0=(anova(model2))$'Sum Sq'[length(anova(model2)$'Sum Sq')]
+      SSE_Z=(anova(model3))$'Sum Sq'[length(anova(model3)$'Sum Sq')]
+      SSE_XZ=(anova(model4))$'Sum Sq'[length(anova(model4)$'Sum Sq')]
+      df_X0=(anova(model2))$'Df'[length(anova(model2)$'Df')]
+      df_Z=(anova(model3))$'Df'[length(anova(model3)$'Df')]
+      df_XZ=(anova(model4))$'Df'[length(anova(model4)$'Df')]
+      
+      #compute test values
+      df1=df_X0-df_Z
+      df2=df_XZ
+      F.stat=(SSE_X0-SSE_Z)/df1/(SSE_XZ/df2)
+      p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
+    }
   }
   
   return(data.frame(F=F.stat,df1=df1, df2=df2, p.value=p.value))
@@ -205,3 +253,4 @@ LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'C')
 
 LoF(Sale.Price~Age+Square.Feet,  data=FCData, method = 'C')
 
+LoF(Sale.Price~Age+Square.Feet, cluster=Cluster, data=FCData, method = 'S')
