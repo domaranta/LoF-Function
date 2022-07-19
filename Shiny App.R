@@ -17,7 +17,7 @@ library(shiny)
 ui <- fluidPage(
   
   # app title
-  titlePanel("Lack of Fit Test (rename to whatever you would like)"),
+  titlePanel("Lack of Fit Test without Replicates"),
   
   
   #create layout 
@@ -34,14 +34,26 @@ ui <- fluidPage(
       # or start looking around online.  BE SURE TO DO VERSION CONTROL as you start
       # to make changes.
       #br() creates a line break
-      div("Data Import Here (delete this text later)",align="left", style = "font-size: 8pt"),br(),
+    
+      # Copy the line below to make a file upload manager
+      fileInput("data", label = h3("Data Import",align="left")),
+        
+      hr(),
+      fluidRow(column(4, verbatimTextOutput("data"))),
+      hr(),
       
       #Make a way for the user to specify desired formula (e.g. y~sqrt(x1)+x2+I(x2^2))
-      div("Formula Creation Here (delete this text later)",align="left", style = "font-size: 8pt"),br(),
+      textInput("formula", label = h3("Formula input"), value = "y~sqrt(x1)+x2+I(x2^2)"),
       
+      hr(),
+      fluidRow(column(3, verbatimTextOutput("formula"))),
+      hr(),
       #Make a way for the user to specify cluster
-      div("Custer Selection Here (delete this text later)", align="left", style = "font-size: 8pt"),br(),
+      textInput("cluster", label = h3("Cluster input"), value = ""),
       
+      hr(),
+      fluidRow(column(3, verbatimTextOutput("cluster"))),
+      hr(),
       #Test selection drop-down
       #h5 is the 5th level of a hiearchy of decreasing subheadings;i.e.subsubsubsubheading
       selectInput(inputId="test", 
@@ -91,6 +103,11 @@ server <- function(input, output) {
   output$text_test <- renderText({
     paste("Test:", input$test)
   })
+  output$data <- renderPrint({
+    str(input$data)
+  })
+  output$formula <- renderPrint({ input$formula })
+  output$cluster <- renderPrint({ input$cluster })
   
   #Defines "results" to be outputted in main panel
   output$results <- renderTable(digits=4,{
