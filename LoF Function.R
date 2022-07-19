@@ -206,8 +206,7 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
       hat <- hatvalues(fit)
       
       n = length(Y)
-      p = length(all.vars(formula))
-      
+
       cluster = NA
       for(i in 1:n){
         if(hat[i]<=median(hat)){
@@ -220,19 +219,19 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
       
       tempdf <- data.frame(Y, X, cluster)
       tempcdf <- subset(tempdf, subset = (cluster == "C"))
-      n1 = length(tempcdf$Y)
-      n2 = n - n1
+    
       
       model1 = lm(formula, data)
       modelC = lm(Y~X, tempcdf) 
 
       SSE_X=(anova(model1))$'Sum Sq'[length(anova(model1)$'Sum Sq')]
       SSE_C=(anova(modelC))$'Sum Sq'[length(anova(modelC)$'Sum Sq')]
-      
+      DF_X=(anova(model1))$'Df'[length(anova(model1)$'Df')]
+      DF_C=(anova(modelC))$'Df'[length(anova(modelC)$'Df')]
       
       #compute test values
-      df1=n2
-      df2=n1-p
+      df1=DF_X-DF_C
+      df2=DF_C
       F.stat=((SSE_X-SSE_C)/df1)/((SSE_C)/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
@@ -386,8 +385,7 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
       hat <- hatvalues(fit)
       
       n = length(Y)
-      p = length(all.vars(formula))
-      
+
       cluster = NA
       for(i in 1:n){
         if(hat[i]<=median(hat)){
@@ -400,19 +398,18 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
       
       tempdf <- data.frame(Y, X1, X2, cluster)
       tempcdf <- subset(tempdf, subset = (cluster == "C"))
-      n1 = length(tempcdf$Y)
-      n2 = n - n1
+      
       
       model1 = lm(formula, data)
       modelC = lm(Y~X1+X2, tempcdf) 
       
       SSE_X=(anova(model1))$'Sum Sq'[length(anova(model1)$'Sum Sq')]
       SSE_C=(anova(modelC))$'Sum Sq'[length(anova(modelC)$'Sum Sq')]
-      
-      
+      DF_X=(anova(model1))$'Df'[length(anova(model1)$'Df')]
+      DF_C=(anova(modelC))$'Df'[length(anova(modelC)$'Df')]
       #compute test values
-      df1=n2
-      df2=n1-p
+      df1=DF_X-DF_C
+      df2=DF_C
       F.stat=((SSE_X-SSE_C)/df1)/((SSE_C)/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
@@ -422,7 +419,7 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
 }
 #=======================================
 #Examples
-LoF(Sale.Price~Age+Square.Feet, cluster=Cluster, data=FCData, method = 'U')
+LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'U')
 
 
 LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')
