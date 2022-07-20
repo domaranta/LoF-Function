@@ -6,8 +6,8 @@
 library(shiny) 
 
 #source required R scripts 
+#source('testlof.R', encoding = 'UTF-8')
 source('LoF Function.R', encoding = 'UTF-8')
-
 
 ###############################################
 # User Interface (UI)                         #
@@ -165,8 +165,7 @@ server <- function(input, output) {
     data <- if(is.null(input$data)){"Enter Data"}else{sub(".csv$", "", basename(input$data$name))}
     
     
-    data.frame(method=method1, formula = formula1, cluster = cluster1, data = data)  #later replace this with below... or something similar
-    #LoF(formula=formula, cluster=Cluster, data=DF, method = method)
+    data.frame(method=method1, formula = formula1, cluster = cluster1, data = data)
   }) 
   output$lof <- renderTable(digits=4,{
     
@@ -191,13 +190,11 @@ server <- function(input, output) {
                    sep = input$sep,
                    quote = input$quote)          
   
-    formula1 <- noquote(input$formula)
-    cluster1 <- input$cluster
+    
     data1 <- if(is.null(input$data)){"Enter Data"}else{df}#sub(".csv$", "", basename(input$data$name))}
-    #if(data == "Enter Data"){return(NULL)}else{
-    #data.frame(method=method1, formula = formula1, cluster = Cluster1, data = data)
+    
+    #LoF2(formula=eval(parse(text = input$formula)), cluster=input$cluster, data=data1, method = method1)
     LoF(formula=eval(parse(text = input$formula)), cluster=Cluster, data=data1, method = method1)
-      #}
   }) 
   #close the server definition  
 }
