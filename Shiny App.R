@@ -49,30 +49,26 @@ ui <- fluidPage(
       textInput("formula", label = h3("Formula input"), value = "Sale.Price~Square.Feet+Age"),
       
       hr(),
-      fluidRow(column(5, verbatimTextOutput("formula"))),
-      hr(),
       #Make a way for the user to specify cluster
       textInput("cluster", label = h3("Cluster input"), value = "Cluster"),
       
       hr(),
-      fluidRow(column(3, verbatimTextOutput("cluster"))),
-      hr(),
       #Test selection drop-down
       #h5 is the 5th level of a hiearchy of decreasing subheadings;i.e.subsubsubsubheading
       selectInput(inputId="test", 
-                  label=h5("Test:"), 
+                  label=h3("Test:"), 
                   choices = list("Christensen '89","Atwood & Ryan", "Su & Yang", "Shillington", "JSL", "Christensen '91", "Utts")),
       
       #submit button
       div(submitButton("Submit"),align="right"),br(), 
       
       #Contact Info
-      div("Lack of Fit Shiny app (rename to whatever you would like)",align="center", style = "font-size: 8pt"),
+      div("Lack of Fit Shiny app without Replicates",align="center", style = "font-size: 8pt"),
       div("maintained by",
           #replace with your name and for webpage you can use email or your 
           # own webpage if you have one (e.g. github)
-          a(href="https://statistics.calpoly.edu/bret-holladay",target="_blank",
-            "Bret Holladay (replace with your name and webpage/email here)"),align="center", style = "font-size: 8pt"), br(), br(),
+          a(href="https://github.com/domaranta",target="_blank",
+            "Dominic Maranta dmaranta@calpoly.edu"),align="center", style = "font-size: 8pt"), br(), br(),
       
       #close left sidebar   
     ),
@@ -117,7 +113,7 @@ server <- function(input, output) {
     if(is.null(input$data))
       return(NULL)
     dft <- read.csv(input$data$datapath)
-    dft
+    return(dft)
   })
   output$table <- renderTable({df_test()})
   output$formula <- renderPrint({ input$formula })
@@ -142,12 +138,12 @@ server <- function(input, output) {
     }else if(input$test=="Utts"){
       method = "U"
     }
-    formula <- noquote(input$formula)
-    Cluster <- noquote(input$cluster)
-    data <- if(is.null(input$data)){"Enter Data"}else{noquote(sub(".csv$", "", basename(input$data$name)))}
+    formula <- input$formula
+    Cluster <- input$cluster
+    data <- if(is.null(input$data)){"Enter Data"}else{sub(".csv$", "", basename(input$data$name))}
     
     
-    data.frame(method=method, formula = formula, cluster = Cluster, data = data)  #later replace this with below... or something similar
+    data.frame(method=method, formula = deparse(substitute(formula)), cluster = deparse(substitute(Cluster)), data = deparse(substitute(data)))  #later replace this with below... or something similar
     #LoF(formula=formula, cluster=Cluster, data=DF, method = method)
   }) 
   output$lof <- renderTable(digits=4,{
@@ -170,12 +166,12 @@ server <- function(input, output) {
     }
               
   
-    formula <- noquote(input$formula)
-    Cluster <- noquote(input$cluster)
-    data <- if(is.null(input$data)){"Enter Data"}else{noquote(sub(".csv$", "", basename(input$data$name)))}
-    if(data == "Enter Data"){return(NULL)}else{
-      LoF(formula=formula, cluster=Cluster, data=data, method = method)
-      }
+    formula <- input$formula
+    Cluster <- input$cluster
+    data <- if(is.null(input$data)){"Enter Data"}else{sub(".csv$", "", basename(input$data$name))}
+    #if(data == "Enter Data"){return(NULL)}else{
+      LoF(formula=deparse(substitute(formula)), cluster=deparse(substitute(Cluster)), data=deparse(substitute(data)), method = method)
+      #}
   }) 
   #close the server definition  
 }
