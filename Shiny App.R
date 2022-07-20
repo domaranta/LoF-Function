@@ -42,15 +42,31 @@ ui <- fluidPage(
         ".csv")),
         
       hr(),
-      #fluidRow(column(4, verbatimTextOutput("data"))),
-      #hr(),
-      
+      checkboxInput("header", "Header", TRUE),
+      hr(),
+      radioButtons("sep", "Separator",
+                   choices = c(Comma = ",",
+                               Semicolon = ";",
+                               Tab = "\t"),
+                   selected = ","),
+      radioButtons("quote", "Quote",
+                   choices = c(None = "",
+                               "Double Quote" = '"',
+                               "Single Quote" = "'"),
+                   selected = '"'),
+      hr(),
+      radioButtons("disp", "Display",
+                   choices = c(Head = "head",
+                               All = "all"),
+                   selected = "head"),
+    hr(),
+    
       #Make a way for the user to specify desired formula (e.g. y~sqrt(x1)+x2+I(x2^2))
-      textInput("formula", label = h3("Formula input"), value = "Sale.Price~Square.Feet+Age"),
+      textInput("formula", label = h3("Formula Input:"), value = "Sale.Price~Square.Feet+Age"),
       
       hr(),
       #Make a way for the user to specify cluster
-      textInput("cluster", label = h3("Cluster input"), value = "Cluster"),
+      textInput("cluster", label = h3("Cluster Input:"), value = "Cluster"),
       
       hr(),
       #Test selection drop-down
@@ -63,7 +79,7 @@ ui <- fluidPage(
       div(submitButton("Submit"),align="right"),br(), 
       
       #Contact Info
-      div("Lack of Fit Shiny app without Replicates",align="center", style = "font-size: 8pt"),
+      div("Lack of Fit Shiny App Without Replicates",align="center", style = "font-size: 8pt"),
       div("maintained by",
           #replace with your name and for webpage you can use email or your 
           # own webpage if you have one (e.g. github)
@@ -109,13 +125,19 @@ server <- function(input, output) {
   output$text_test <- renderText({
     paste("Test:", input$test)
   })
-  df_test <- reactive({
-    if(is.null(input$data))
-      return(NULL)
-    dft <- read.csv(input$data$datapath)
-    return(dft)
+  output$table <- renderTable({
+    df <- read.csv(input$data$datapath,
+                   header = input$header,
+                   sep = input$sep,
+                   quote = input$quote)
+    
+    if(input$disp == "head") {
+      return(head(df))
+    }
+    else {
+      return(df)
+    }
   })
-  output$table <- renderTable({df_test()})
   output$formula <- renderPrint({ input$formula })
   output$cluster <- renderPrint({ input$cluster })
   
@@ -143,7 +165,7 @@ server <- function(input, output) {
     data <- if(is.null(input$data)){"Enter Data"}else{sub(".csv$", "", basename(input$data$name))}
     
     
-    data.frame(method=method, formula = deparse(substitute(formula)), cluster = deparse(substitute(Cluster)), data = deparse(substitute(data)))  #later replace this with below... or something similar
+    data.frame(method=method, formula = formula, cluster = Cluster, data = data)  #later replace this with below... or something similar
     #LoF(formula=formula, cluster=Cluster, data=DF, method = method)
   }) 
   output$lof <- renderTable(digits=4,{
@@ -164,13 +186,16 @@ server <- function(input, output) {
     }else if(input$test=="Utts"){
       method = "U"
     }
-              
+    df <- read.csv(input$data$datapath,
+                   header = input$header,
+                   sep = input$sep,
+                   quote = input$quote)          
   
     formula <- input$formula
     Cluster <- input$cluster
-    data <- if(is.null(input$data)){"Enter Data"}else{sub(".csv$", "", basename(input$data$name))}
+    data <- if(is.null(input$data)){"Enter Data"}else{df}#sub(".csv$", "", basename(input$data$name))}
     #if(data == "Enter Data"){return(NULL)}else{
-      LoF(formula=deparse(substitute(formula)), cluster=deparse(substitute(Cluster)), data=deparse(substitute(data)), method = method)
+      LoF(formula=formula, cluster=Cluster, data=data, method = method)
       #}
   }) 
   #close the server definition  
