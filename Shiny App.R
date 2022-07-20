@@ -46,13 +46,13 @@ ui <- fluidPage(
       #hr(),
       
       #Make a way for the user to specify desired formula (e.g. y~sqrt(x1)+x2+I(x2^2))
-      textInput("formula", label = h3("Formula input"), value = "y~sqrt(x1)+x2+I(x2^2)"),
+      textInput("formula", label = h3("Formula input"), value = "Sale.Price~Square.Feet+Age"),
       
       hr(),
       fluidRow(column(5, verbatimTextOutput("formula"))),
       hr(),
       #Make a way for the user to specify cluster
-      textInput("cluster", label = h3("Cluster input"), value = ""),
+      textInput("cluster", label = h3("Cluster input"), value = "Cluster"),
       
       hr(),
       fluidRow(column(3, verbatimTextOutput("cluster"))),
@@ -113,13 +113,13 @@ server <- function(input, output) {
   output$text_test <- renderText({
     paste("Test:", input$test)
   })
-  df <- reactive({
+  df_test <- reactive({
     if(is.null(input$data))
       return(NULL)
     dft <- read.csv(input$data$datapath)
     dft
   })
-  output$table <- renderTable({df()})
+  output$table <- renderTable({df_test()})
   output$formula <- renderPrint({ input$formula })
   output$cluster <- renderPrint({ input$cluster })
   
@@ -142,10 +142,10 @@ server <- function(input, output) {
     }else if(input$test=="Utts"){
       method = "U"
     }
-    formula <- input$formula
-    Cluster <- input$cluster
-    data <- if(is.null(input$data)){"Enter Data"}else{input$data$name}
-              
+    formula <- noquote(input$formula)
+    Cluster <- noquote(input$cluster)
+    data <- if(is.null(input$data)){"Enter Data"}else{noquote(sub(".csv$", "", basename(input$data$name)))}
+    
     
     data.frame(method=method, formula = formula, cluster = Cluster, data = data)  #later replace this with below... or something similar
     #LoF(formula=formula, cluster=Cluster, data=DF, method = method)
@@ -170,11 +170,12 @@ server <- function(input, output) {
     }
               
   
-    formula <- input$formula
-    Cluster <- input$cluster
-    data <- if(is.null(input$data)){"Enter Data"}else{input$data}
-    
-    LoF(formula=formula, cluster=Cluster, data=data, method = method)
+    formula <- noquote(input$formula)
+    Cluster <- noquote(input$cluster)
+    data <- if(is.null(input$data)){"Enter Data"}else{noquote(sub(".csv$", "", basename(input$data$name)))}
+    if(data == "Enter Data"){return(NULL)}else{
+      LoF(formula=formula, cluster=Cluster, data=data, method = method)
+      }
   }) 
   #close the server definition  
 }
