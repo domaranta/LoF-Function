@@ -6,7 +6,7 @@
 library(shiny) 
 
 #source required R scripts 
-#source('LoF_Function.R', encoding = 'UTF-8')
+source('LoF Function.R', encoding = 'UTF-8')
 
 
 ###############################################
@@ -36,17 +36,20 @@ ui <- fluidPage(
       #br() creates a line break
     
       # Copy the line below to make a file upload manager
-      fileInput("data", label = h3("Data Import",align="left")),
+      fileInput("data", label = h3("Import CSV File",align="left"), accept =  c(
+        "text/csv",
+        "text/comma-separated-values,text/plain",
+        ".csv")),
         
       hr(),
-      fluidRow(column(4, verbatimTextOutput("data"))),
-      hr(),
+      #fluidRow(column(4, verbatimTextOutput("data"))),
+      #hr(),
       
       #Make a way for the user to specify desired formula (e.g. y~sqrt(x1)+x2+I(x2^2))
       textInput("formula", label = h3("Formula input"), value = "y~sqrt(x1)+x2+I(x2^2)"),
       
       hr(),
-      fluidRow(column(3, verbatimTextOutput("formula"))),
+      fluidRow(column(5, verbatimTextOutput("formula"))),
       hr(),
       #Make a way for the user to specify cluster
       textInput("cluster", label = h3("Cluster input"), value = ""),
@@ -84,9 +87,16 @@ ui <- fluidPage(
       br(),
       
       #tells the app to output "results" defined below
-      tableOutput("results")
+      tableOutput("results"),
       
-      #close main panel   
+      tableOutput("lof"),
+      #close main panel
+      
+    
+      # Create a new row for the table.
+      
+      tableOutput('table')
+        
     )
   )
   #close the UI definition  
@@ -103,9 +113,13 @@ server <- function(input, output) {
   output$text_test <- renderText({
     paste("Test:", input$test)
   })
-  output$data <- renderPrint({
-    str(input$data)
+  df <- reactive({
+    if(is.null(input$data))
+      return(NULL)
+    dft <- read.csv(input$data$datapath)
+    dft
   })
+  output$table <- renderTable({df()})
   output$formula <- renderPrint({ input$formula })
   output$cluster <- renderPrint({ input$cluster })
   
@@ -114,13 +128,23 @@ server <- function(input, output) {
     
     #extract input to be used in LoF function
     method <- input$test
-    #formula <- 
-    #Cluster <-
-    #data <-
+    formula <- input$formula
+    Cluster <- input$cluster
+    data <- if(is.null(input$data)){"Enter Data"}else{input$data$name}
+              
     
-    data.frame(method=method)  #later replace this with below... or something similar
-    #LoF(formula, cluster=Cluster, data=DF, method = method)
+    data.frame(method=method, formula = formula, cluster = Cluster, data = data)  #later replace this with below... or something similar
+    #LoF(formula=formula, cluster=Cluster, data=DF, method = method)
+  }) 
+  output$lof <- renderTable(digits=4,{
     
+    #extract input to be used in LoF function
+    method <- input$test
+    formula <- input$formula
+    Cluster <- input$cluster
+    data <- if(is.null(input$data)){"Enter Data"}else{input$data}
+    
+    LoF(formula=formula, cluster=Cluster, data=data, method = method)
   }) 
   #close the server definition  
 }
