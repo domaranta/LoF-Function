@@ -61,7 +61,7 @@ ui <- fluidPage(
       #h5 is the 5th level of a hiearchy of decreasing subheadings;i.e.subsubsubsubheading
       selectInput(inputId="test", 
                   label=h5("Test:"), 
-                  choices = list("Christensen '89","Atwood & Ryan", "Su and Yang", "Shillington", "JSL", "Christensen '91", "Utts")),
+                  choices = list("Christensen '89","Atwood & Ryan", "Su & Yang", "Shillington", "JSL", "Christensen '91", "Utts")),
       
       #submit button
       div(submitButton("Submit"),align="right"),br(), 
@@ -127,7 +127,21 @@ server <- function(input, output) {
   output$results <- renderTable(digits=4,{
     
     #extract input to be used in LoF function
-    method <- input$test
+    method <- if(input$test=="Christensen '89"){
+      method="C89"
+    } else if(input$test=="Atwood & Ryan"){
+      method ="AR"
+    } else if(input$test=="Su & Yang"){
+      method = "SY"
+    }else if(input$test=="Shillington"){
+      method = "S"
+    }else if(input$test=="Christensen '91"){
+      method = "C91"
+    }else if(input$test=="JSL"){
+      method = "JSL"
+    }else if(input$test=="Utts"){
+      method = "U"
+    }
     formula <- input$formula
     Cluster <- input$cluster
     data <- if(is.null(input$data)){"Enter Data"}else{input$data$name}
@@ -139,7 +153,23 @@ server <- function(input, output) {
   output$lof <- renderTable(digits=4,{
     
     #extract input to be used in LoF function
-    method <- input$test
+    method <- if(input$test=="Christensen '89"){
+      method="C89"
+    } else if(input$test=="Atwood & Ryan"){
+      method ="AR"
+    } else if(input$test=="Su & Yang"){
+      method = "SY"
+    }else if(input$test=="Shillington"){
+      method = "S"
+    }else if(input$test=="Christensen '91"){
+      method = "C91"
+    }else if(input$test=="JSL"){
+      method = "JSL"
+    }else if(input$test=="Utts"){
+      method = "U"
+    }
+              
+  
     formula <- input$formula
     Cluster <- input$cluster
     data <- if(is.null(input$data)){"Enter Data"}else{input$data}
