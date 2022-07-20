@@ -9,18 +9,18 @@
 ########################################
 # Import & format sample data          #
 ########################################
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) 
-library(readr)
+#setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) 
+#library(readr)
 #FCData = read_table("FirstCityData.txt")
-FCData = read_table2("FirstCityData.txt")
-str(FCData)
+#FCData = read_table2("FirstCityData.txt")
+#str(FCData)
 
 #remove dollar signs from Sale.Price column
-FCData$Sale.Price = as.numeric(gsub("[\\$,]", "", FCData$Sale.Price))
+#FCData$Sale.Price = as.numeric(gsub("[\\$,]", "", FCData$Sale.Price))
 
 #Change Cluster to type factor
-FCData$Cluster = factor(FCData$Cluster)
-str(FCData)
+#FCData$Cluster = factor(FCData$Cluster)
+#str(FCData)
 
 ########################################
 # Experimenting with formulas          #
@@ -28,27 +28,27 @@ str(FCData)
 # references
 # https://www.datacamp.com/tutorial/r-formula-tutorial
 
-formula<-Sale.Price~Age
-formula
-terms(formula)
-all.vars(formula)
-all.names(formula)
-length(all.vars(formula))
+#formula<-Sale.Price~Age
+#formula
+#terms(formula)
+#all.vars(formula)
+#all.names(formula)
+#length(all.vars(formula))
 
 
-formula<-Sale.Price~Age+I(Age^2)+log(Square.Feet)
-all.vars(formula)
-terms(formula)
-tf<-terms(formula)
-attr(tf,"variables")
-noquote(all.vars(formula))
+#formula<-Sale.Price~Age+I(Age^2)+log(Square.Feet)
+#all.vars(formula)
+#terms(formula)
+#tf<-terms(formula)
+#attr(tf,"variables")
+#noquote(all.vars(formula))
 
 #How to extract Y, X1, X2 from formula
-(Y=FCData[,all.vars(formula)[1]])
-(X1=FCData[,all.vars(formula)[2]])
-(X2=FCData[,all.vars(formula)[3]])
+#(Y=FCData[,all.vars(formula)[1]])
+#(X1=FCData[,all.vars(formula)[2]])
+#(X2=FCData[,all.vars(formula)[3]])
 
-formula = Sale.Price~Age+Square.Feet+Cluster
+#formula = Sale.Price~Age+Square.Feet+Cluster
 
 
 
@@ -419,17 +419,17 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
 }
 #=======================================
 #Examples
-LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'U')
+#LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'U')
 
 
-LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')
-LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData, method = 'SY')
+#LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')
+#LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData, method = 'SY')
 
-LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'AR')
-LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'AR')
+#LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'AR')
+#LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'AR')
 
-LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'C89')
-LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'C89')
+#LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'C89')
+#LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'C89')
 
 
-LoF(Sale.Price~Age+Square.Feet, cluster=Cluster, data=FCData, method = 'C91')
+#LoF(Sale.Price~Age+Square.Feet, cluster=Cluster, data=FCData, method = 'C91')
