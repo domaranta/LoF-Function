@@ -145,7 +145,7 @@ server <- function(input, output) {
   output$results <- renderTable(digits=4,{
     
     #extract input to be used in LoF function
-    method <- if(input$test=="Christensen '89"){
+    method1 <- if(input$test=="Christensen '89"){
       method="C89"
     } else if(input$test=="Atwood & Ryan"){
       method ="AR"
@@ -160,18 +160,18 @@ server <- function(input, output) {
     }else if(input$test=="Utts"){
       method = "U"
     }
-    formula <- input$formula
-    Cluster <- input$cluster
+    formula1 <- input$formula
+    cluster1 <- input$cluster
     data <- if(is.null(input$data)){"Enter Data"}else{sub(".csv$", "", basename(input$data$name))}
     
     
-    data.frame(method=method, formula = formula, cluster = Cluster, data = data)  #later replace this with below... or something similar
+    data.frame(method=method1, formula = formula1, cluster = cluster1, data = data)  #later replace this with below... or something similar
     #LoF(formula=formula, cluster=Cluster, data=DF, method = method)
   }) 
   output$lof <- renderTable(digits=4,{
     
     #extract input to be used in LoF function
-    method <- if(input$test=="Christensen '89"){
+    method1 <- if(input$test=="Christensen '89"){
       method="C89"
     } else if(input$test=="Atwood & Ryan"){
       method ="AR"
@@ -191,11 +191,12 @@ server <- function(input, output) {
                    sep = input$sep,
                    quote = input$quote)          
   
-    formula <- input$formula
-    Cluster <- input$cluster
-    data <- if(is.null(input$data)){"Enter Data"}else{df}#sub(".csv$", "", basename(input$data$name))}
+    formula1 <- noquote(input$formula)
+    cluster1 <- input$cluster
+    data1 <- if(is.null(input$data)){"Enter Data"}else{df}#sub(".csv$", "", basename(input$data$name))}
     #if(data == "Enter Data"){return(NULL)}else{
-      LoF(formula=formula, cluster=Cluster, data=data, method = method)
+    #data.frame(method=method1, formula = formula1, cluster = Cluster1, data = data)
+    LoF(formula=eval(parse(text = input$formula)), cluster=Cluster, data=data1, method = method1)
       #}
   }) 
   #close the server definition  
