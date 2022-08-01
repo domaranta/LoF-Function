@@ -28,7 +28,7 @@
 # references
 # https://www.datacamp.com/tutorial/r-formula-tutorial
 
-#formula<-Sale.Price~Age
+#formula<-Sale.Price~Age+Square.Feet
 #formula
 #terms(formula)
 #all.vars(formula)
@@ -56,16 +56,20 @@
 # LoF Su & Yang                        #
 ########################################
 
-LoF <-function(formula, cluster = NULL, data, method = "SY"){
+LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
   
   if(length(all.vars(formula))>3){
     stop('function designed for <3 predictors')
   }
-  
-  cluster = data[,deparse(substitute(cluster))]
+  if(shiny == FALSE){
+    cluster = data[,deparse(substitute(cluster))]
+  }else{
+    cluster = data[,cluster]
+  }
   if(is.numeric(cluster)== TRUE){
     cluster <- as.factor(cluster)
   }
+  
  
   #If a 1 predictor model
   if(length(all.vars(formula))==2){
@@ -73,6 +77,9 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
     #Extract Y, X from formula
     Y=data[,all.vars(formula)[1]]
     X=data[,all.vars(formula)[2]]
+    
+    #km <- kmeans(scale(X), 5, nstart = 25)
+    #cluster <- km$cluster
     
     #If method selected is Su and Yang
     if(method=='SY'){
@@ -245,6 +252,9 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
     X1=data[,all.vars(formula)[2]]
     X2=data[,all.vars(formula)[3]]
     
+    #km <- kmeans(scale(c(X1,X2)), 5, nstart = 25)#clustering issues here
+    #cluster <- km$cluster
+    
     #If method selected is Su and Yang
     if(method=='SY'){
       #Calculate each model information
@@ -415,15 +425,18 @@ LoF <-function(formula, cluster = NULL, data, method = "SY"){
     }
   }
   
-  return(data.frame(F=F.stat,df1=df1, df2=df2, p.value=p.value))
+  return(data.frame(F=F.stat,Df1=df1, Df2=df2, p.value=p.value))
 }
 #=======================================
 #Examples
-#LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'U')
+#LoF(Sale.Price~Age, cluster="Cluster", data=FCData, method = 'U', shiny = TRUE)
 
 
 #LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')
 #LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData, method = 'SY')
+#LoF(Sale.Price~Square.Feet+Age, cluster="Cluster", data=FCData, method = 'SY', shiny = TRUE)
+#LoF(Sale.Price~Square.Feet+Age, k = 5, data=FCData, method = 'C89')
+#LoF(Sale.Price~Age, k = 5, data=FCData, method = 'SY')
 
 #LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'AR')
 #LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'AR')
