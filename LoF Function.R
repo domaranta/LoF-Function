@@ -6,54 +6,9 @@
 # Frost M22
 # Dominic Maranta (Cal Poly)
 # Advisor: Bret Holladay (Cal Poly)
-########################################
-# Import & format sample data          #
-########################################
-#setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) 
-#library(readr)
-#FCData = read_table("FirstCityData.txt")
-#FCData = read_table2("FirstCityData.txt")
-#str(FCData)
-
-#remove dollar signs from Sale.Price column
-#FCData$Sale.Price = as.numeric(gsub("[\\$,]", "", FCData$Sale.Price))
-
-#Change Cluster to type factor
-#FCData$Cluster = factor(FCData$Cluster)
-#str(FCData)
 
 ########################################
-# Experimenting with formulas          #
-########################################
-# references
-# https://www.datacamp.com/tutorial/r-formula-tutorial
-
-#formula<-Sale.Price~Age+Square.Feet
-#formula
-#terms(formula)
-#all.vars(formula)
-#all.names(formula)
-#length(all.vars(formula))
-
-
-#formula<-Sale.Price~Age+I(Age^2)+log(Square.Feet)
-#all.vars(formula)
-#terms(formula)
-#tf<-terms(formula)
-#attr(tf,"variables")
-#noquote(all.vars(formula))
-
-#How to extract Y, X1, X2 from formula
-#(Y=FCData[,all.vars(formula)[1]])
-#(X1=FCData[,all.vars(formula)[2]])
-#(X2=FCData[,all.vars(formula)[3]])
-
-#formula = Sale.Price~Age+Square.Feet+Cluster
-
-
-
-########################################
-# LoF Su & Yang                        #
+# LoF                       #
 ########################################
 
 LoF <-function(formula, cluster = NULL, k = 0, data, method, shiny = FALSE){
