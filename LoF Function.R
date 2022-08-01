@@ -56,21 +56,21 @@
 # LoF Su & Yang                        #
 ########################################
 
-LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
+LoF <-function(formula, cluster = NULL, k = 0, data, method, shiny = FALSE){
   
   if(length(all.vars(formula))>3){
     stop('function designed for <3 predictors')
   }
-  if(shiny == FALSE){
-    cluster = data[,deparse(substitute(cluster))]
-  }else{
-    cluster = data[,cluster]
+  if(k == 0){
+    if(shiny == FALSE){
+      cluster = data[,deparse(substitute(cluster))]
+    }else{
+      cluster = data[,cluster]
+    }
+    if(is.numeric(cluster)== TRUE){
+      cluster <- as.factor(cluster)
+    }
   }
-  if(is.numeric(cluster)== TRUE){
-    cluster <- as.factor(cluster)
-  }
-  
- 
   #If a 1 predictor model
   if(length(all.vars(formula))==2){
     
@@ -78,8 +78,10 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
     Y=data[,all.vars(formula)[1]]
     X=data[,all.vars(formula)[2]]
     
-    #km <- kmeans(scale(X), 5, nstart = 25)
-    #cluster <- km$cluster
+    if(k != 0){
+      km <- kmeans(scale(X), k, nstart = 25)
+      cluster <- as.factor(km$cluster)
+    }
     
     #If method selected is Su and Yang
     if(method=='SY'){
@@ -252,8 +254,10 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
     X1=data[,all.vars(formula)[2]]
     X2=data[,all.vars(formula)[3]]
     
-    #km <- kmeans(scale(c(X1,X2)), 5, nstart = 25)#clustering issues here
-    #cluster <- km$cluster
+    if(k != 0){
+      km <- kmeans(scale(matrix(c(X1, X2), ncol=2)), k, nstart = 25)
+      cluster <- as.factor(km$cluster)
+    }
     
     #If method selected is Su and Yang
     if(method=='SY'){
@@ -435,8 +439,8 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
 #LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')
 #LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData, method = 'SY')
 #LoF(Sale.Price~Square.Feet+Age, cluster="Cluster", data=FCData, method = 'SY', shiny = TRUE)
-#LoF(Sale.Price~Square.Feet+Age, k = 5, data=FCData, method = 'C89')
-#LoF(Sale.Price~Age, k = 5, data=FCData, method = 'SY')
+#LoF(Sale.Price~Square.Feet+Age,cluster = Cluster,k=5, data=FCData, method = 'SY')
+#LoF(Sale.Price~Age, cluster = Cluster,k = 0, data=FCData, method = 'SY')
 
 #LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'AR')
 #LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'AR')

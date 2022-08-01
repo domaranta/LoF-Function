@@ -53,6 +53,9 @@ ui <- fluidPage(
       textInput("cluster", label = h3("Cluster Input:"), value = "Cluster"),
       
       hr(),
+      numericInput("k", label = h3("K-Means Cluster Input:"), value = 0),
+    
+      hr(),
       #Test selection drop-down
       #h5 is the 5th level of a hiearchy of decreasing subheadings;i.e.subsubsubsubheading
       selectInput(inputId="test", 
@@ -66,7 +69,7 @@ ui <- fluidPage(
       div("Lack of Fit Shiny App Without Replicates",align="center", style = "font-size: 8pt"),
       div("maintained by",
           a(href="https://github.com/domaranta",target="_blank",
-            "Dominic Maranta dmaranta@calpoly.edu"),align="center", style = "font-size: 8pt"), br(), br(),
+            "Dominic Maranta dmaranta@calpoly.edu"),align="center", style = "font-size: 8pt"), br()
       
     ),
     
@@ -165,7 +168,7 @@ server <- function(input, output) {
     
     data1 <- if(is.null(input$data)){"Enter Data"}else{df}
     
-    LoF(formula=eval(parse(text = input$formula)), cluster=input$cluster, data=data1, method = method1, shiny = TRUE)
+    LoF(formula=eval(parse(text = input$formula)), cluster=input$cluster, k = input$k, data=data1, method = method1, shiny = TRUE)
   }) 
 }
 
