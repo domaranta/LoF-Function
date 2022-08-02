@@ -54,9 +54,10 @@ ui <- fluidPage(
       #Cluster input
       textInput("cluster", label = h3("Cluster Input:"), value = "Cluster"),
       
+      
       hr(),
-      numericInput("k", label = h3("K-Means Cluster Input:"), value = 0),
-    
+      numericInput("k", label = h3("K-Means Cluster Input:"), value = NULL, min = 2),
+      div("Leave blank if cluster column is already specified above.",align="center", style = "font-size: 8pt"),
       hr(),
       #Test selection drop-down
       #h5 is the 5th level of a hiearchy of decreasing subheadings;i.e.subsubsubsubheading
@@ -194,8 +195,12 @@ server <- function(input, output) {
   
     
     data1 <- if(is.null(input$data)){"Enter Data"}else{df}
-    
-    LoF(formula=eval(parse(text = input$formula)), cluster=input$cluster, k = input$k, data=data1, method = method1, shiny = TRUE)
+    #if(is.null(input$k)){k1 = NULL}else{k1 = input$k}
+    k1 = NULL
+    if(is.numeric(input$k)){
+      k1 = input$k
+    }
+    LoF(formula=eval(parse(text = input$formula)), cluster=input$cluster, k = k1, data=data1, method = method1, shiny = TRUE)
   }) 
 }
 
