@@ -394,7 +394,7 @@ LoF <-function(formula, cluster = NULL, k = 0, data, method, shiny = FALSE){
 #LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')
 #LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData, method = 'SY')
 #LoF(Sale.Price~Square.Feet+Age, cluster="Cluster", data=FCData, method = 'SY', shiny = TRUE)
-#LoF(Sale.Price~Square.Feet+Age,cluster = Cluster,k=5, data=FCData, method = 'SY')
+#LoF(Sale.Price~Square.Feet+Age, k=5, data=FCData, method = 'SY')
 #LoF(Sale.Price~Age, cluster = Cluster,k = 0, data=FCData, method = 'SY')
 
 #LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'AR')

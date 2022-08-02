@@ -3,6 +3,8 @@
 ###############################################
 
 library(shiny) 
+library(cluster)
+library(factoextra)
 
 source('LoF Function.R', encoding = 'UTF-8')
 
@@ -74,13 +76,13 @@ ui <- fluidPage(
     ),
     
     mainPanel(
+      tableOutput('results'),
       
-      
-      tableOutput("results"),
-      
-      tableOutput("lof"),
-    
-      tableOutput('table')
+      tabsetPanel(
+        tabPanel("Input Table", tableOutput("table")), 
+        tabPanel("Clustering", plotOutput("clusterplot"), verbatimTextOutput("clusterwarning")), 
+        tabPanel("Results",tableOutput("lof"), verbatimTextOutput("pvalwarning"))
+      )
         
     )
   )
@@ -93,8 +95,11 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   #Defines "text_test" to be outputted in main panel
-  output$text_test <- renderText({
-    paste("Test:", input$test)
+  output$clusterwarning <- renderText({
+    "*Optimal number of clusters occurs where the elbow or beginning of less change in SSE becomes apparent"
+  })
+  output$pvalwarning <- renderText({
+    "*Only the left tail p-value is shown, for right tail p-value subtract p-value from one. A small right tail p-value can be indicative of within cluster lack of fit"
   })
   output$table <- renderTable({
     
@@ -114,6 +119,27 @@ server <- function(input, output) {
   })
   output$formula <- renderPrint({ input$formula })
   output$cluster <- renderPrint({ input$cluster })
+  
+  output$clusterplot <- renderPlot({
+    req(input$data)
+    df <- read.csv(input$data$datapath,
+                   header = input$header,
+                   sep = input$sep,
+                   quote = input$quote)
+    formula1 <- eval(parse(text = input$formula))
+    if(length(all.vars(formula1))==2){
+      X=df[,all.vars(formula1)[2]]
+      fviz_nbclust(scale(X),kmeans,method = "wss")
+    }
+    if(length(all.vars(formula1))==3){
+      X1=df[,all.vars(formula1)[2]]
+      X2=df[,all.vars(formula1)[3]]
+      fviz_nbclust(scale(matrix(c(X1, X2), ncol=2)),kmeans,method = "wss")
+    }
+    
+    
+   }
+    )
   
   #Defines table "results" to be outputted in main panel
   output$results <- renderTable(digits=4,{
@@ -135,10 +161,11 @@ server <- function(input, output) {
     }
     formula1 <- input$formula
     cluster1 <- input$cluster
+    k <- input$k
     data <- if(is.null(input$data)){"Enter Data"}else{sub(".csv$", "", basename(input$data$name))}
     
     
-    data.frame(Method=method1, Formula = formula1, Cluster = cluster1, Data = data)
+    data.frame(Method=method1, Formula = formula1, Cluster = cluster1, k = k, Data = data)
   }) 
   #Compute LoF results
   output$lof <- renderTable(digits=4,{
