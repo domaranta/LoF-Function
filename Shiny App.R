@@ -48,7 +48,7 @@ ui <- fluidPage(
     hr(),
     
       #Formula input
-      textInput("formula", label = h3("Formula Input:"), value = "Sale.Price~Square.Feet"),
+      textInput("formula", label = h3("Formula Input:"), value = "Sale.Price~Square.Feet+Age"),
       
       hr(),
       #Cluster input
