@@ -48,7 +48,7 @@ ui <- fluidPage(
     hr(),
     
       #Formula input
-      textInput("formula", label = h3("Formula Input:"), value = "Sale.Price~Square.Feet+Age"),
+      textInput("formula", label = h3("Formula Input:"), value = "Sale.Price~Square.Feet"),
       
       hr(),
       #Cluster input
@@ -130,10 +130,9 @@ server <- function(input, output) {
     formula1 <- eval(parse(text = input$formula))
     if(length(all.vars(formula1))==2){
       X=df[,all.vars(formula1)[2]]
-      fviz_nbclust(scale(matrix(X)),kmeans,method = "wss")
-      #plot(X)
+      fviz_nbclust(scale(X),kmeans,method = "wss")
     }
-    if(length(all.vars(formula1))==3){
+     else if(length(all.vars(formula1))==3){
       X1=df[,all.vars(formula1)[2]]
       X2=df[,all.vars(formula1)[3]]
       fviz_nbclust(scale(matrix(c(X1, X2), ncol=2)),kmeans,method = "wss")
@@ -151,10 +150,10 @@ server <- function(input, output) {
         Y=df[,all.vars(formula1)[1]]
         X=df[,all.vars(formula1)[2]]
         km <- kmeans(scale(X), input$k, nstart = 25)
-        fviz_cluster(km, data = data.frame(X, Y))
+        fviz_cluster(km, data = data.frame(X, Y),xlab = all.vars(formula1)[2], ylab = paste(all.vars(formula1)[1], " - Y-variable for plotting purposes only"))
         #plot(X,Y)
       }
-      if(length(all.vars(formula1))==3){
+       else if(length(all.vars(formula1))==3){
         X1=df[,all.vars(formula1)[2]]
         X2=df[,all.vars(formula1)[3]]
         km <- kmeans(scale(matrix(c(X1, X2), ncol=2)), input$k, nstart = 25)
