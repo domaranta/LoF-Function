@@ -100,7 +100,7 @@ server <- function(input, output) {
     "*Optimal number of clusters occurs where the elbow or beginning of less change in SSE becomes apparent"
   })
   output$pvalwarning <- renderText({
-    "*Only the left tail p-value is shown, for right tail p-value subtract p-value from one. A small right tail p-value can be indicative of within cluster lack of fit"
+    "*Only the right tail p-value is shown, for left tail p-value subtract p-value from one. A small left tail p-value can be indicative of within cluster lack of fit"
   })
   output$table <- renderTable({
     
@@ -151,7 +151,6 @@ server <- function(input, output) {
         X=df[,all.vars(formula1)[2]]
         km <- kmeans(scale(X), input$k, nstart = 25)
         fviz_cluster(km, data = data.frame(X, Y),xlab = all.vars(formula1)[2], ylab = paste(all.vars(formula1)[1], " - Y-variable for plotting purposes only"))
-        #plot(X,Y)
       }
        else if(length(all.vars(formula1))==3){
         X1=df[,all.vars(formula1)[2]]
