@@ -82,7 +82,7 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel("Input Table", tableOutput("table")), 
         tabPanel("Clustering", plotOutput("clusterplot"), verbatimTextOutput("clusterwarning")), 
-        tabPanel("Results",tableOutput("lof"), verbatimTextOutput("pvalwarning"))
+        tabPanel("Results",tableOutput("lof"), verbatimTextOutput("pvalwarning"), plotOutput("clusterfinal"))
       )
         
     )
@@ -130,14 +130,36 @@ server <- function(input, output) {
     formula1 <- eval(parse(text = input$formula))
     if(length(all.vars(formula1))==2){
       X=df[,all.vars(formula1)[2]]
-      fviz_nbclust(scale(X),kmeans,method = "wss")
+      fviz_nbclust(scale(matrix(X)),kmeans,method = "wss")
+      #plot(X)
     }
     if(length(all.vars(formula1))==3){
       X1=df[,all.vars(formula1)[2]]
       X2=df[,all.vars(formula1)[3]]
       fviz_nbclust(scale(matrix(c(X1, X2), ncol=2)),kmeans,method = "wss")
     }
-    
+    })
+    output$clusterfinal <- renderPlot({
+      req(input$data)
+      req(input$k)
+      df <- read.csv(input$data$datapath,
+                     header = input$header,
+                     sep = input$sep,
+                     quote = input$quote)
+      formula1 <- eval(parse(text = input$formula))
+      if(length(all.vars(formula1))==2){
+        Y=df[,all.vars(formula1)[1]]
+        X=df[,all.vars(formula1)[2]]
+        km <- kmeans(scale(X), input$k, nstart = 25)
+        fviz_cluster(km, data = data.frame(X, Y))
+        #plot(X,Y)
+      }
+      if(length(all.vars(formula1))==3){
+        X1=df[,all.vars(formula1)[2]]
+        X2=df[,all.vars(formula1)[3]]
+        km <- kmeans(scale(matrix(c(X1, X2), ncol=2)), input$k, nstart = 25)
+        fviz_cluster(km,data = data.frame(X1, X2), xlab = all.vars(formula1)[2], ylab = all.vars(formula1)[3])
+      }
     
    }
     )
