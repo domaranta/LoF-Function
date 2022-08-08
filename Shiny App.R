@@ -82,7 +82,7 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel("Input Table", tableOutput("table")), 
         tabPanel("Clustering", plotOutput("clusterplot"), verbatimTextOutput("clusterwarning")), 
-        tabPanel("Results",tableOutput("lof"), verbatimTextOutput("pvalwarning"), plotOutput("clusterfinal"))
+        tabPanel("Results",tableOutput("lof"), verbatimTextOutput("pvalwarning"), tabsetPanel(tabPanel("Column Clustering",plotOutput("clusterfinalc")),tabPanel("K Clustering",plotOutput("clusterfinal"))))
       )
         
     )
@@ -161,6 +161,32 @@ server <- function(input, output) {
     
    }
     )
+  
+    output$clusterfinalc <- renderPlot({
+      req(input$data)
+      req(input$cluster)
+      #!req(input$k)
+      df <- read.csv(input$data$datapath,
+                     header = input$header,
+                     sep = input$sep,
+                     quote = input$quote)
+      formula1 <- eval(parse(text = input$formula))
+      Cluster <- as.factor(df[,input$cluster])
+      if(length(all.vars(formula1))==2){
+        Y=df[,all.vars(formula1)[1]]
+        X=df[,all.vars(formula1)[2]]
+       # ggplot(aes(x= X, y = Y, col = cluster1))
+        qplot(x= X1, y = Y, color = Cluster, main = "Cluster Plot",xlab = all.vars(formula1)[2], ylab = paste(all.vars(formula1)[1], " - Y-variable for plotting purposes only"))
+      }
+      else if(length(all.vars(formula1))==3){
+        X1=df[,all.vars(formula1)[2]]
+        X2=df[,all.vars(formula1)[3]]
+        qplot(x= X1, y = X2, color = Cluster, main = "Cluster Plot",xlab = all.vars(formula1)[2], ylab = all.vars(formula1)[3])
+      }
+      
+    }
+    )
+    
   
   #Defines table "results" to be outputted in main panel
   output$results <- renderTable(digits=4,{
