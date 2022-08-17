@@ -27,7 +27,7 @@ LoF(formula, cluster, k, data, method, shiny)
   the matrix or data frame containing the variables in the formula and in the cluster.
 }
 \item{method}{
-  a character string specifying the lack of fit test method, must be one of "C89", "AR", "SY", "S", "JSL", "C91", "U".
+  a character string specifying the lack of fit test method, must be one of "C89", "AR", "SY", "S", "JSL", "C91", "U", "BR".
 }
 \item{shiny}{
   a logical statement for internal shiny app usage.
@@ -46,7 +46,9 @@ method = "JSL" is the method for the test corresponding to the lack of fit metho
 
 method = "C91" is the method for the test corresponding to the lack of fit method described by Christensen 1991.This method compares the mean square lack of fit estimate of residual variance determined by a comparison of a regression model of the cluster means to the cluster means themselves to the mean square pure error estimate of residual variance determined by comparing the fitted regression model to the regression model of the cluster means and adjusting with the cluster means themselves. This test is UMPI for orthogonal lack of fit. The estimates are compared using an F test for lack of fit evaluation. 
 
-method = "U" is the method for the test corresponding to the lack of fit method described by Utts 1982.This method compares the mean square lack of fit estimate of residual variance determined by comparing the overall fitted model to a model fitting a linear model to the central cluster, determined within the algorithm, as the centermost half of observations, and fitting the outside points exactly. This variance estimate is then compared to the mean square variance estimate from the pure error by the same model fitting a line to the central cluster and exact fitting the other observations. This test also utilizes an F test for lack of fit evaluation. 
+method = "U" is the method for the test corresponding to the lack of fit method described by Utts 1982.This method compares the mean square lack of fit estimate of residual variance determined by comparing the overall fitted model to a model fitting a linear model to the central cluster, determined within the algorithm, as the centermost half of observations, and fitting the outside points exactly. This variance estimate is then compared to the mean square variance estimate from the pure error by the same model fitting a line to the central cluster and exact fitting the other observations. This test also utilizes an F test for lack of fit evaluation. It does not need cluster specification. 
+
+method = "BR" is the method for the lack of fit test corresponding to Burn and Ryan 1983. This method examines each predictor individually for curvature and interaction lack of fit. One predictor case utilizes only the curvature test while more predictors produce 2k total tests, 2 for each variable. The user should use the Bonferonni adjustment, and note that a rejection in any of the tests indicates a lack of fit. It does not need cluster specification. 
 }
 \value{
 %%  ~Describe the value returned
@@ -65,6 +67,9 @@ method = "U" is the method for the test corresponding to the lack of fit method 
 \references{
 %% ~put references to the literature/web site here ~
 Atwood, C., and Ryan, T. (1976), "A Class of Tests for Lack of Fit to a Regression Model," unpublished manuscript.
+
+Burn, D. A. & Ryan, Jr. T. A. (1983) A diagnostic test for lack of fit in regression models, American
+Statistical Association, Proceedings of the Statistical Computing Section, pp. 286–290.
 
 Christensen, R. (1989), "Lack-of-Fit Test Based on Near or Exact Replicates," The Annals of Statistics, 17, 673-683.
 
