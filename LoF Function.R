@@ -16,7 +16,8 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
   if(length(all.vars(formula))>3){
     stop('function designed for <3 predictors')
   }
-  if(is.null(k) & method != "U"){
+  if(method == "U" | method == "BR"){}
+  else if(is.null(k)){
     if(shiny == FALSE){
       cluster = data[,deparse(substitute(cluster))]
     }else{
@@ -182,10 +183,8 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
       clusterc = as.factor(clusterc)
       
       tempdf <- data.frame(data, clusterc)
-      #tempdf <- merge(data, cluster, by = NULL)
       tempcdf <- subset(tempdf, subset = (clusterc == "C"))
-      #tempdf <- data.frame(Y,X, cluster)
-      #tempcdf <- subset(tempdf, subset = (cluster == "C"))
+  
       
       model1 = lm(formula, data)
       modelC = lm(formula, tempcdf) 
@@ -200,6 +199,21 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
       df2=DF_C
       F.stat=((SSE_X-SSE_C)/df1)/((SSE_C)/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
+    }
+    #If Burn and Ryan
+    if(method == "BR"){
+      Model <- lm(formula, data)
+      Model_C <- lm(Y~X+(X>mean(X))+X:(X>mean(X)))
+      SSE=(anova(Model))$'Sum Sq'[length(anova(Model)$'Sum Sq')]
+      SSE_C=(anova(Model_C))$'Sum Sq'[length(anova(Model_C)$'Sum Sq')]
+      df=(anova(Model))$'Df'[length(anova(Model)$'Df')]
+      df_C=(anova(Model_C))$'Df'[length(anova(Model_C)$'Df')]
+      
+      df1 = df-df_C
+      df2 = df_C
+      F.stat = ((SSE-SSE_C)/df1)/((SSE_C)/df2)
+      p.value = pf(F.stat, df1, df2,lower.tail=FALSE)
+      
     }
   }
   
@@ -384,6 +398,54 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
       F.stat=((SSE_X-SSE_C)/df1)/((SSE_C)/df2)
       p.value=pf(F.stat, df1, df2,lower.tail=FALSE)
     }
+    #If Burn and Ryan
+    if(method == "BR"){
+      #X1
+      Model <- lm(formula, data)
+      Model_C <- lm(Y~X1+X2+(X1>mean(X1))+X1:(X1>mean(X1)))
+      Model_I <- lm(Y~X1+X2+(X1>mean(X1))+X1:(X1>mean(X1))+X2:(X1>mean(X1)))
+      SSE=(anova(Model))$'Sum Sq'[length(anova(Model)$'Sum Sq')]
+      SSE_C=(anova(Model_C))$'Sum Sq'[length(anova(Model_C)$'Sum Sq')]
+      SSE_I=(anova(Model_I))$'Sum Sq'[length(anova(Model_I)$'Sum Sq')]
+      df=(anova(Model))$'Df'[length(anova(Model)$'Df')]
+      df_C=(anova(Model_C))$'Df'[length(anova(Model_C)$'Df')]
+      df_I=(anova(Model_I))$'Df'[length(anova(Model_I)$'Df')]
+      
+      #X1 Curvature
+      df11C=df-df_C
+      df21C=df_I
+      F1C=((SSE-SSE_C)/df11C)/((SSE_I)/df21C)
+      p.value1C = pf(F1C, df11C, df21C,lower.tail=FALSE)
+      #X1 Interaction
+      df11I=df_C-df_I
+      df21I=df_I
+      F1I=((SSE_C-SSE_I)/df11I)/((SSE_I)/df21I)
+      p.value1I =pf(F1I, df11I, df21I,lower.tail=FALSE)
+      
+      #X2
+      Model <- lm(formula, data)
+      Model_C <- lm(Y~X1+X2+(X2>mean(X2))+X2:(X2>mean(X2)))
+      Model_I <- lm(Y~X1+X2+(X2>mean(X2))+X2:(X2>mean(X2))+X1:(X2>mean(X2)))
+      SSE=(anova(Model))$'Sum Sq'[length(anova(Model)$'Sum Sq')]
+      SSE_C=(anova(Model_C))$'Sum Sq'[length(anova(Model_C)$'Sum Sq')]
+      SSE_I=(anova(Model_I))$'Sum Sq'[length(anova(Model_I)$'Sum Sq')]
+      df=(anova(Model))$'Df'[length(anova(Model)$'Df')]
+      df_C=(anova(Model_C))$'Df'[length(anova(Model_C)$'Df')]
+      df_I=(anova(Model_I))$'Df'[length(anova(Model_I)$'Df')]
+      
+      #X2 Curvature
+      df12C=df-df_C
+      df22C=df_I
+      F2C=((SSE-SSE_C)/df12C)/((SSE_I)/df22C)
+      p.value2C = pf(F2C, df12C, df22C,lower.tail=FALSE)
+      #X1 Interaction
+      df12I=df_C-df_I
+      df22I=df_I
+      F2I=((SSE_C-SSE_I)/df12I)/((SSE_I)/df22I)
+      p.value2I = pf(F2I, df12I, df22I,lower.tail=FALSE)
+      data1 = data.frame(Test = c("X1 Curve", "X1 Interaction", "X2 Curve", "X2 Interaction"),F = c(F1C, F1I, F2C, F2I), Df1 = c(df11C, df11I,df12C,df12I),Df2 = c(df21C, df21I,df22C,df22I), p.value = c(p.value1C, p.value1I, p.value2C, p.value2I))
+      return(data1)
+    }
   }
   
   return(data.frame(F=F.stat,Df1=df1, Df2=df2, p.value=p.value))
@@ -392,6 +454,8 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
 #Examples
 #LoF(Sale.Price~Age, data=FCData, method = 'U')
 #LoF(Sale.Price~Age+Square.Feet, data=FCData, method = 'U')
+#LoF(Volume~Girth+Height, data = trees, method = 'BR')
+#LoF(Volume~Girth+Height+log(Girth), data = trees, method = 'BR')
 
 
 #LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')

@@ -63,7 +63,7 @@ ui <- fluidPage(
       #h5 is the 5th level of a hiearchy of decreasing subheadings;i.e.subsubsubsubheading
       selectInput(inputId="test", 
                   label=h3("Test:"), 
-                  choices = list("Christensen '89","Atwood & Ryan", "Su & Yang", "Shillington", "JSL", "Christensen '91", "Utts")),
+                  choices = list("Christensen '89","Atwood & Ryan", "Su & Yang", "Shillington", "JSL", "Christensen '91", "Utts", "Burn & Ryan")),
       
       #submit button
       div(submitButton("Submit"),align="right"),br(), 
@@ -82,7 +82,7 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel("Input Table", tableOutput("table")), 
         tabPanel("Clustering", plotOutput("clusterplot"), verbatimTextOutput("clusterwarning")), 
-        tabPanel("Results",tableOutput("lof"), verbatimTextOutput("pvalwarning"), tabsetPanel(tabPanel("Column Clustering",plotOutput("clusterfinalc")),tabPanel("K Clustering",plotOutput("clusterfinal"))))
+        tabPanel("Results",tableOutput("lof"), verbatimTextOutput("br"),verbatimTextOutput("pvalwarning"), tabsetPanel(tabPanel("Column Clustering",plotOutput("clusterfinalc")),tabPanel("K Clustering",plotOutput("clusterfinal"))))
       )
         
     )
@@ -101,6 +101,11 @@ server <- function(input, output) {
   })
   output$pvalwarning <- renderText({
     "*Only the right tail p-value is shown, for left tail p-value subtract p-value from one. A small left tail p-value can be indicative of within cluster lack of fit"
+  })
+  output$br <-renderText({
+    if(input$test=="Burn & Ryan"){
+      "For two predictor Burn and Ryan test, use the Bonferonni adjustment on the four tests."
+    }
   })
   output$table <- renderTable({
     
@@ -206,6 +211,8 @@ server <- function(input, output) {
       method = "JSL"
     }else if(input$test=="Utts"){
       method = "U"
+    }else if(input$test=="Burn & Ryan"){
+      method = "BR"
     }
     formula1 <- input$formula
     cluster1 <- input$cluster
@@ -235,6 +242,8 @@ server <- function(input, output) {
     }else if(input$test=="Utts"){
       method = "U"
     }
+    else if(input$test=="Burn & Ryan"){
+      method = "BR"}
     df <- read.csv(input$data$datapath,
                    header = input$header,
                    sep = input$sep,
