@@ -123,6 +123,7 @@ server <- function(input, output) {
   
   output$clusterplot <- renderPlot({
     req(input$data)
+    req(input$formula)
     df <- read.csv(input$data$datapath,
                    header = input$header,
                    sep = input$sep,

@@ -171,22 +171,24 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
       
       n = length(Y)
 
-      cluster = NA
+      clusterc = NA
       for(i in 1:n){
         if(hat[i]<=median(hat)){
-          cluster[i] = "C"
+          clusterc[i] = "C"
         }else{
-          cluster[i] = "O"
+          clusterc[i] = "O"
         }
       }
-      cluster = as.factor(cluster)
+      clusterc = as.factor(clusterc)
       
-      tempdf <- data.frame(Y, X, cluster)
-      tempcdf <- subset(tempdf, subset = (cluster == "C"))
-    
+      tempdf <- data.frame(data, clusterc)
+      #tempdf <- merge(data, cluster, by = NULL)
+      tempcdf <- subset(tempdf, subset = (clusterc == "C"))
+      #tempdf <- data.frame(Y,X, cluster)
+      #tempcdf <- subset(tempdf, subset = (cluster == "C"))
       
       model1 = lm(formula, data)
-      modelC = lm(Y~X, tempcdf) 
+      modelC = lm(formula, tempcdf) 
 
       SSE_X=(anova(model1))$'Sum Sq'[length(anova(model1)$'Sum Sq')]
       SSE_C=(anova(modelC))$'Sum Sq'[length(anova(modelC)$'Sum Sq')]
@@ -365,12 +367,12 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
       }
       cluster = as.factor(cluster)
       
-      tempdf <- data.frame(Y, X1, X2, cluster)
+      tempdf <- data.frame(data, cluster)
       tempcdf <- subset(tempdf, subset = (cluster == "C"))
       
       
       model1 = lm(formula, data)
-      modelC = lm(Y~X1+X2, tempcdf) 
+      modelC = lm(formula, tempcdf) 
       
       SSE_X=(anova(model1))$'Sum Sq'[length(anova(model1)$'Sum Sq')]
       SSE_C=(anova(modelC))$'Sum Sq'[length(anova(modelC)$'Sum Sq')]
@@ -389,6 +391,7 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
 #=======================================
 #Examples
 #LoF(Sale.Price~Age, data=FCData, method = 'U')
+#LoF(Sale.Price~Age+Square.Feet, data=FCData, method = 'U')
 
 
 #LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')
@@ -404,4 +407,4 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
 #LoF(Sale.Price~Square.Feet+Age, cluster=Cluster, data=FCData,method = 'C89')
 
 
-#LoF(Sale.Price~Age+Square.Feet, cluster=Cluster, data=FCData, method = 'C91')
+#LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'U')

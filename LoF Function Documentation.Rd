@@ -6,11 +6,11 @@
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-Compute lack of fit test for models without replicates. Contains options for three various non-replicate tests.
+Compute lack of fit test for models without replicates. Contains options for seven various non-replicate tests.
 
 }
 \usage{
-LoF(formula, cluster, k, data, method)
+LoF(formula, cluster, k, data, method, shiny)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -29,6 +29,9 @@ LoF(formula, cluster, k, data, method)
 \item{method}{
   a character string specifying the lack of fit test method, must be one of "C89", "AR", "SY", "S", "JSL", "C91", "U".
 }
+\item{shiny}{
+  a logical statement for internal shiny app usage.
+}
 }
 \details{
 method = "C89" is the method for the test corresponding to the lack of fit method described by Christensen 1989.This method compares the fitted model specified in the formula with a full model approximation using clustering to plot regression lines with the same slope in each cluster. An F test then compares the fitted model to this full model approximation for lack of fit evaluation.
@@ -41,7 +44,7 @@ method = "S" is the method for the test corresponding to the lack of fit method 
 
 method = "JSL" is the method for the test corresponding to the lack of fit method described by Joglekar, Schuenemyer, LaRiccia 1989.This method compares the mean square lack of fit estimate of residual variance determined by a comparison of a regression model of the cluster means to the cluster means themselves to the mean square pure error estimate of residual variance determined by plotting regression lines with different slopes in each cluster, the same full model as Atwood and Ryan. The estimates are compared using an F test for lack of fit evaluation. 
 
-method = "C91" is the method for the test corresponding to the lack of fit method described by Christensen 1991.This method compares the mean square lack of fit estimate of residual variance determined by a comparison of a regression model of the cluster means to the cluster means themselves to the mean square pure error estimate of residual variance determined by comparing the fitted regression model to the regression model of the cluster means and adjusting with the cluster means themselves. The estimates are compared using an F test for lack of fit evaluation. 
+method = "C91" is the method for the test corresponding to the lack of fit method described by Christensen 1991.This method compares the mean square lack of fit estimate of residual variance determined by a comparison of a regression model of the cluster means to the cluster means themselves to the mean square pure error estimate of residual variance determined by comparing the fitted regression model to the regression model of the cluster means and adjusting with the cluster means themselves. This test is UMPI for orthogonal lack of fit. The estimates are compared using an F test for lack of fit evaluation. 
 
 method = "U" is the method for the test corresponding to the lack of fit method described by Utts 1982.This method compares the mean square lack of fit estimate of residual variance determined by comparing the overall fitted model to a model fitting a linear model to the central cluster, determined within the algorithm, as the centermost half of observations, and fitting the outside points exactly. This variance estimate is then compared to the mean square variance estimate from the pure error by the same model fitting a line to the central cluster and exact fitting the other observations. This test also utilizes an F test for lack of fit evaluation. 
 }
