@@ -48,11 +48,11 @@ ui <- fluidPage(
     hr(),
     
       #Formula input
-      textInput("formula", label = h3("Formula Input:"), value = "Sale.Price~Square.Feet+Age"),
+      textInput("formula", label = h3("Formula Input:"), value = ""),
       
       hr(),
       #Cluster input
-      textInput("cluster", label = h3("Cluster Input:"), value = "Cluster"),
+      textInput("cluster", label = h3("Cluster Input:"), value = ""),
       
       
       hr(),
@@ -104,7 +104,8 @@ server <- function(input, output) {
   })
   output$br <-renderText({
     if(input$test=="Burn & Ryan"){
-      "For two predictor Burn and Ryan test, use the Bonferonni adjustment on the four tests."
+      "For two predictor Burn and Ryan test, use the Bonferonni adjustment on the four tests. 
+      Additionally, Burn and Ryan can only be ran for simple additive models at this time (no transformations or higher order models)."
     }
   })
   output$table <- renderTable({

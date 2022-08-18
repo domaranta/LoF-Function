@@ -8,7 +8,7 @@
 # Advisor: Bret Holladay (Cal Poly)
 
 ########################################
-# LoF                       #
+# LoF                                  #
 ########################################
 
 LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
@@ -202,7 +202,7 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
     }
     #If Burn and Ryan
     if(method == "BR"){
-      Model <- lm(formula, data)
+      Model <- lm(Y~X, data)
       Model_C <- lm(Y~X+(X>mean(X))+X:(X>mean(X)))
       SSE=(anova(Model))$'Sum Sq'[length(anova(Model)$'Sum Sq')]
       SSE_C=(anova(Model_C))$'Sum Sq'[length(anova(Model_C)$'Sum Sq')]
@@ -401,7 +401,7 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
     #If Burn and Ryan
     if(method == "BR"){
       #X1
-      Model <- lm(formula, data)
+      Model <- lm(Y~X1+X2)
       Model_C <- lm(Y~X1+X2+(X1>mean(X1))+X1:(X1>mean(X1)))
       Model_I <- lm(Y~X1+X2+(X1>mean(X1))+X1:(X1>mean(X1))+X2:(X1>mean(X1)))
       SSE=(anova(Model))$'Sum Sq'[length(anova(Model)$'Sum Sq')]
@@ -455,7 +455,7 @@ LoF <-function(formula, cluster = NULL, k = NULL, data, method, shiny = FALSE){
 #LoF(Sale.Price~Age, data=FCData, method = 'U')
 #LoF(Sale.Price~Age+Square.Feet, data=FCData, method = 'U')
 #LoF(Volume~Girth+Height, data = trees, method = 'BR')
-#LoF(Volume~Girth+Height+log(Girth), data = trees, method = 'BR')
+#LoF(Volume~log(Girth)+Height, data = trees, method = 'BR')
 
 
 #LoF(Sale.Price~Age, cluster=Cluster, data=FCData, method = 'SY')
